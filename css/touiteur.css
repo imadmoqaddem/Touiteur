@@ -10,6 +10,8 @@ body {
 	color:#E74C3C;
 }
 
+.label,.glyphicon { margin-right:5px; }
+
 .form-signin
 {
     max-width: 330px;
