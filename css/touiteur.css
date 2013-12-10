@@ -6,6 +6,10 @@ body {
   background-size: cover;
 }
 
+.hidden-block {
+	display: none;
+}
+
 .color-touiteur {
 	color:#E74C3C;
 }
@@ -40,17 +44,22 @@ body {
 {
     z-index: 2;
 }
-.form-signin input[type="text"]
+.form-signin input
 {
+	margin: 0;
     margin-bottom: -1px;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
+    border-radius: 0;
 }
-.form-signin input[type="password"]
+.form-signin input.first
+{
+	border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+.form-signin input.last
 {
     margin-bottom: 10px;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
 }
 .account-wall
 {
