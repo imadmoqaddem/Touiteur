@@ -1,11 +1,28 @@
 var Touiteur = (function(){
 
+	var touiteur_api = "http://touiteur.3ie.fr/"
+	var api = {
+		signin: {
+			url: touiteur_api + "api/user/login",
+			req_type: "GET",
+			res_type: "XML"
+		},
+		signup: {
+			url: touiteur_api + "api/user/register",
+			req_type: "POST",
+			res_type: "XML"
+		},
+	};
+
 	var screens = {
 		signin: "#screen-0",
 		signup: "#screen-1"
 	};
 	var screen_current;
 	var screen_old = screens.signin;
+
+	$signup = $('#touiteur-signup');
+	$signin = $('#touiteur-signin');
 
 	var init = function(screen){
 		for (var s in screens)
@@ -24,7 +41,30 @@ var Touiteur = (function(){
 
 	var initScreens = function()
 	{
+		$signup.on('submit', function(e){
+			e.preventDefault();
+			$.ajax({
+				type: api['signup']['req_type'],
+				url:api['signup']['url'],
+				data: {
+					login: $(this).find('input[name=login]').val(),
+					email: $(this).find('input[name=mail]').val(),
+					password: $(this).find('input[name=password]').val()
+				}
+			});
+		});
 
+		$signin.on('submit', function(e){
+			e.preventDefault();
+			$.ajax({
+				type: api['signin']['req_type'],
+				url:api['signin']['url'],
+				data: {
+					login: $(this).find('input[name=login]').val(),
+					password: $(this).find('input[name=password]').val()
+				}
+			});
+		});
 	};
 
 	var renderTab = function(screen)

@@ -4,6 +4,16 @@ body {
   -moz-background-size: cover;
   -o-background-size: cover;
   background-size: cover;
+  overflow:hidden;
+}
+
+video {
+	position: absolute;
+	z-index: 0;
+	top: 0;
+	left: 0;
+	min-width: 100%;
+	min-height: 100%;
 }
 
 .hidden-block {
@@ -63,6 +73,7 @@ body {
 }
 .account-wall
 {
+	opacity: 0.8;
     margin-top: 20px;
     margin-bottom: 40px;
     padding: 10px 0px 20px 0px;
