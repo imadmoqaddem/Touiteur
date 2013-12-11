@@ -45,10 +45,10 @@ var Touiteur = (function(){
 		
 		/*
 		http://syddev.com/jquery.videoBG/index.html#documentation
-		*//*
-		$('body').videoBG({
+		*/
+		/*$('body').videoBG({
 			position:"fixed",
-			zIndex:1,
+			zIndex:-1,
 			opacity:1,
 			loop:true,
 			scale:true,
@@ -56,8 +56,8 @@ var Touiteur = (function(){
 			mp4:'img/background_video.mp4',
 			webm:'img/background_video.webm',
 			poster:'img/paris.jpg'
-		});*/
-
+		});
+*/
 		$signup.on('submit', function(e){
 			e.preventDefault();
 			$.ajax({
