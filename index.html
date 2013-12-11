@@ -6,7 +6,7 @@
     
     <title>Touiter App - Twitter Like by Imad</title>
     
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <!-- Bootstrap -->
     <link rel="stylesheet" type="text/css" href="css/touiteur.css">
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -19,25 +19,11 @@
     <![endif]-->
   </head>
   <body>
-    <video autoplay="autoplay" loop="loop" src="img/background_video.webm">
+    <video autoplay="autoplay" loop="true" class="visible-md visible-lg">
+        <source src="img/background_video.mp4" type="video/mp4" />
+        <source src="img/background_video.webm" type="video/webm" />
+        <source src="img/background_video.ogv" type="video/ogg" />
     </video>
-    
-    <script>
-    function isiPhone(){
-        return (
-            (navigator.platform.indexOf("iPhone") != -1) ||
-            (navigator.platform.indexOf("iPod") != -1) ||
-            (navigator.platform.indexOf("iPad") != -1)
-        );
-    }
-
-    if (isiPhone())
-    {
-        elts = document.body.getElementsByTagName('video');
-        for (index = elts.length - 1; index >= 0; index--)
-            elts[index].parentNode.removeChild(elts[index]);
-    }
-    </script>
     
     <div class="container hidden-block">
         <nav class="navbar navbar-default" role="navigation">

@@ -1,15 +1,14 @@
 var Touiteur_Utilities = (function(){
 
 	var Json = (function(){
-		var decode_rec = function(json_string, i, i_max){
+		var decode_rec = function(json_string, i, i_max, obj){
 
 		};
 
 		var decode = function(json_string){
-			var res = {};/*
-			console.log(json_string.length);
-			int i_max = json_string.length;
-			int i = 0;*/
+			var res = {};
+			var i_max = json_string.length;
+			var i = 0;
 			return res;
 		};
 
