@@ -1,3 +1,28 @@
+var Touiteur_Utilities = (function(){
+
+	var Json = (function(){
+		var decode_rec = function(json_string, i, i_max){
+
+		};
+
+		var decode = function(json_string){
+			var res = {};/*
+			console.log(json_string.length);
+			int i_max = json_string.length;
+			int i = 0;*/
+			return res;
+		};
+
+		return {
+			decode: decode
+		}
+	})();
+
+	return {
+		Json: Json
+	}
+})();
+
 var Touiteur = (function(){
 
 	var touiteur_api = "http://touiteur.3ie.fr/"
@@ -57,7 +82,7 @@ var Touiteur = (function(){
 			webm:'img/background_video.webm',
 			poster:'img/paris.jpg'
 		});
-*/
+		*/
 		$signup.on('submit', function(e){
 			e.preventDefault();
 			$.ajax({
@@ -121,4 +146,5 @@ var Touiteur = (function(){
 $(document).ready(function() { 
 	initScreen = 'signin';
 	Touiteur.init(initScreen);
+	console.log(Touiteur_Utilities.Json.decode('{ yo : "mama" }'));
 });

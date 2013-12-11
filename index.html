@@ -19,12 +19,28 @@
     <![endif]-->
   </head>
   <body>
-    
     <video poster="img/paris.jpg" autoplay="autoplay" loop="loop">
         <source src="img/background_video.mp4" type="video/mp4" />
         <source src="img/background_video.webm" type="video/webm" />
         <source src="img/background_video.ogv" type="video/ogg" />
     </video>
+    
+    <script>
+    function isiPhone(){
+        return (
+            (navigator.platform.indexOf("iPhone") != -1) ||
+            (navigator.platform.indexOf("iPod") != -1) ||
+            (navigator.platform.indexOf("iPad") != -1)
+        );
+    }
+
+    if (isiPhone())
+    {
+        elts = document.body.getElementsByTagName('video');
+        for (index = elts.length - 1; index >= 0; index--)
+            elts[index].parentNode.removeChild(elts[index]);
+    }
+    </script>
     
     <div class="container hidden-block">
         <nav class="navbar navbar-default" role="navigation">
