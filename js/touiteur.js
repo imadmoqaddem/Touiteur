@@ -41,14 +41,14 @@ var Touiteur = (function(){
 
 	var initScreens = function()
 	{
-		$.noty.defaults.timeout = 2000;
+		$.noty.basics.timeout = 2000;
 		
 		/*
 		http://syddev.com/jquery.videoBG/index.html#documentation
-		
+		*//*
 		$('body').videoBG({
 			position:"fixed",
-			zIndex:0,
+			zIndex:1,
 			opacity:1,
 			loop:true,
 			scale:true,
@@ -71,8 +71,10 @@ var Touiteur = (function(){
 			}).done(function(data){
 				notify('success', 'Successful Registration !');
 				renderTab('signin');
+				alert('success');
 			}).fail(function(data){
 				notify('error', 'Registration failed, try again !');
+				alert('error');
 			});
 		});
 
@@ -87,8 +89,10 @@ var Touiteur = (function(){
 				}
 			}).done(function(data){
 				notify('success', 'Successful Authentication !');
+				alert('success');
 			}).fail(function(data){
 				notify('error', 'Authentication Failed !');
+				alert('error');
 			});
 		});
 	};
@@ -104,7 +108,7 @@ var Touiteur = (function(){
 	var notify = function(type, msg, layout){
 		if (layout == undefined)
 			layout = "top";
-		var n = noty({type:type, text: msg});
+		var n = noty({type:type, text: msg, layout:layout});
 	}
 
 	return {

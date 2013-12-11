@@ -26,7 +26,7 @@ if (typeof Object.create !== 'function') {
         init:function (options) {
 
             // Mix in the passed in options with the default options
-            this.options = $.extend({}, $.noty.defaults, options);
+            this.options = $.extend({}, $.noty.basics, options);
 
             this.options.layout = (this.options.custom) ? $.noty.layouts['inline'] : $.noty.layouts[this.options.layout];
 
@@ -432,7 +432,7 @@ if (typeof Object.create !== 'function') {
         window.alert = windowAlert;
     };
 
-    $.noty.defaults = {
+    $.noty.basics = {
         layout:'top',
         theme:'defaultTheme',
         type:'alert',
