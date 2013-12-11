@@ -41,6 +41,23 @@ var Touiteur = (function(){
 
 	var initScreens = function()
 	{
+		$.noty.defaults.timeout = 2000;
+		
+		/*
+		http://syddev.com/jquery.videoBG/index.html#documentation
+		
+		$('body').videoBG({
+			position:"fixed",
+			zIndex:0,
+			opacity:1,
+			loop:true,
+			scale:true,
+			ogv:'img/background_video.ogv',
+			mp4:'img/background_video.mp4',
+			webm:'img/background_video.webm',
+			poster:'img/paris.jpg'
+		});*/
+
 		$signup.on('submit', function(e){
 			e.preventDefault();
 			$.ajax({
@@ -51,6 +68,11 @@ var Touiteur = (function(){
 					email: $(this).find('input[name=mail]').val(),
 					password: $(this).find('input[name=password]').val()
 				}
+			}).done(function(data){
+				notify('success', 'Successful Registration !');
+				renderTab('signin');
+			}).fail(function(data){
+				notify('error', 'Registration failed, try again !');
 			});
 		});
 
@@ -63,6 +85,10 @@ var Touiteur = (function(){
 					login: $(this).find('input[name=login]').val(),
 					password: $(this).find('input[name=password]').val()
 				}
+			}).done(function(data){
+				notify('success', 'Successful Authentication !');
+			}).fail(function(data){
+				notify('error', 'Authentication Failed !');
 			});
 		});
 	};
@@ -75,6 +101,11 @@ var Touiteur = (function(){
 		$(screen_current).show();
 	};
 
+	var notify = function(type, msg, layout){
+		if (layout == undefined)
+			layout = "top";
+		var n = noty({type:type, text: msg});
+	}
 
 	return {
 		init: init
@@ -85,7 +116,5 @@ var Touiteur = (function(){
 
 $(document).ready(function() { 
 	initScreen = 'signin';
-	Touiteur.init(initScreen); 
-
-
+	Touiteur.init(initScreen);
 });
