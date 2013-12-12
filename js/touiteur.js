@@ -46,6 +46,7 @@ var Touiteur = (function(){
 	var screen_current;
 	var screen_old = screens.signin;
 
+	$wall = $('.wall');
 	$navbar = $('#navbar');
 	$signup = $('#touiteur-signup');
 	$signin = $('#touiteur-signin');
@@ -85,13 +86,13 @@ var Touiteur = (function(){
 		});
 		*/
 
-		var $container = $('.wall');
 		// initialize
-		$container.masonry({
-		  columnWidth: 310,
+		$wall.masonry({
+		  columnWidth: 300,
 		  itemSelector: '.wall-box',
-		  gutter: 20,
-		  isFitWidth: true
+		  gutter: 30,
+		  isFitWidth: true,
+		  isInitLayout: false
 		});
 
 		$signup.on('submit', function(e){
@@ -142,6 +143,8 @@ var Touiteur = (function(){
 			$navbar.show();
 		else
 			$navbar.hide();
+		if (screen == "home")
+			$wall.data('masonry').layout();
 	};
 
 	var notify = function(type, msg, layout){
@@ -158,7 +161,7 @@ var Touiteur = (function(){
 
 
 $(document).ready(function() { 
-	initScreen = 'home';
+	initScreen = 'signin';
 	Touiteur.init(initScreen);
 	console.log(Touiteur_Utilities.Json.decode('{ yo : "mama" }'));
 });
