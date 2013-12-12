@@ -35,16 +35,18 @@ var Touiteur = (function(){
 			url: touiteur_api + "api/user/register",
 			req_type: "POST",
 			res_type: "XML"
-		},
+		}
 	};
 
 	var screens = {
-		signin: "#screen-0",
-		signup: "#screen-1"
+		signin: { container: "#screen-0", navbar: false },
+		signup: { container: "#screen-1", navbar: false },
+		home: { container: "#screen-2", navbar: true }
 	};
 	var screen_current;
 	var screen_old = screens.signin;
 
+	$navbar = $('#navbar');
 	$signup = $('#touiteur-signup');
 	$signin = $('#touiteur-signin');
 
@@ -82,6 +84,16 @@ var Touiteur = (function(){
 			poster:'img/paris.jpg'
 		});
 		*/
+
+		var $container = $('.wall');
+		// initialize
+		$container.masonry({
+		  columnWidth: 310,
+		  itemSelector: '.wall-box',
+		  gutter: 20,
+		  isFitWidth: true
+		});
+
 		$signup.on('submit', function(e){
 			e.preventDefault();
 			$.ajax({
@@ -95,10 +107,8 @@ var Touiteur = (function(){
 			}).done(function(data){
 				notify('success', 'Successful Registration !');
 				renderTab('signin');
-				alert('success');
 			}).fail(function(data){
 				notify('error', 'Registration failed, try again !');
-				alert('error');
 			});
 		});
 
@@ -113,10 +123,10 @@ var Touiteur = (function(){
 				}
 			}).done(function(data){
 				notify('success', 'Successful Authentication !');
-				alert('success');
+				renderTab('home');
 			}).fail(function(data){
 				notify('error', 'Authentication Failed !');
-				alert('error');
+				renderTab('home');
 			});
 		});
 	};
@@ -125,8 +135,13 @@ var Touiteur = (function(){
 	{
 		screen_old = screen_current;
 		screen_current = screens[screen];
-		$(screen_old).hide();
-		$(screen_current).show();
+		if (screen_old != undefined)
+			$(screen_old.container).hide();
+		$(screen_current.container).show();
+		if (screen_current.navbar)
+			$navbar.show();
+		else
+			$navbar.hide();
 	};
 
 	var notify = function(type, msg, layout){
@@ -143,7 +158,7 @@ var Touiteur = (function(){
 
 
 $(document).ready(function() { 
-	initScreen = 'signin';
+	initScreen = 'home';
 	Touiteur.init(initScreen);
 	console.log(Touiteur_Utilities.Json.decode('{ yo : "mama" }'));
 });
