@@ -7,7 +7,8 @@
     <title>Touiter App - Twitter Like by Imad</title>
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <!-- Bootstrap -->
+    
+    <link href='http://fonts.googleapis.com/css?family=Petit+Formal+Script&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="css/touiteur.css">
     <link href="css/bootstrap.min.css" rel="stylesheet">
 
@@ -74,29 +75,7 @@
                     </li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><span
-                        class="glyphicon glyphicon-comment"></span>Chats <span class="label label-primary">42</span>
-                    </a>
-                        <ul class="dropdown-menu">
-                            <li><a href="#"><span class="label label-warning">7:00 AM</span>Hi :)</a></li>
-                            <li><a href="#"><span class="label label-warning">8:00 AM</span>How are you?</a></li>
-                            <li><a href="#"><span class="label label-warning">9:00 AM</span>What are you doing?</a></li>
-                            <li class="divider"></li>
-                            <li><a href="#" class="text-center">View All</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><span
-                        class="glyphicon glyphicon-envelope"></span>Inbox <span class="label label-info">32</span>
-                    </a>
-                        <ul class="dropdown-menu">
-                            <li><a href="#"><span class="label label-warning">4:00 AM</span>Favourites Snippet</a></li>
-                            <li><a href="#"><span class="label label-warning">4:30 AM</span>Email marketing</a></li>
-                            <li><a href="#"><span class="label label-warning">5:00 AM</span>Subscriber focused email
-                                design</a></li>
-                            <li class="divider"></li>
-                            <li><a href="#" class="text-center">View All</a></li>
-                        </ul>
-                    </li>
+                    <li><a href="#" data-touiteur-goto="post"><span class="glyphicon glyphicon-pencil"></span>Post</a></li>
                     <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><span
                         class="glyphicon glyphicon-user"></span>Admin <b class="caret"></b></a>
                         <ul class="dropdown-menu">
@@ -120,8 +99,8 @@
                     <img class="profile-img" src="img/logo_user.png"
                         alt="">
                     <form class="form-signin" id="touiteur-signin">
-                    <input type="text" class="form-control first" placeholder="Email" required>
-                    <input type="password" class="form-control last" placeholder="Password" required>
+                    <input type="text" class="form-control first" placeholder="Email" required name="login">
+                    <input type="password" class="form-control last" placeholder="Password" required name="password">
                     <button class="btn btn-lg btn-primary btn-block" type="submit">
                         Sign in</button>
                     <a href="#" class="pull-left new-account" data-touiteur-goto="signup">Create an account </a>
@@ -249,6 +228,13 @@
                 </div>
     </div>
     
+    <div class="container hidden-block" id="screen-3">
+        <h1 id="post_content">Write a Touite, You won't regret it !</h1>
+        <input type="text" id="post_touite" />
+    </div>
+
+
+
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script type="text/javascript" src="js/jquery-2.0.3.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
@@ -256,6 +242,7 @@
     <!--<script src="js/jquery.videoBG.js"></script>-->
 
   <script src="js/noty/jquery.noty.js"></script>
+  <script src="js/jquery.cookie.js"></script>
   <script src="js/masonry.js"></script>
   
   <script src="js/noty/layouts/bottom.js"></script>

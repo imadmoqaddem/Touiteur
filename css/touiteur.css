@@ -1,3 +1,7 @@
+/*
+font-family: 'Petit Formal Script', cursive;
+*/
+
 body { 
   background: url(../img/paris.jpg) no-repeat center center fixed; 
   -webkit-background-size: cover;
@@ -9,13 +13,31 @@ body {
 
 video {
 	position: fixed;
-	z-index: 0;
+	z-index: -2;
 	top: 0;
 	left: 0;
 	min-width: 100%;
 	min-height: 100%;
 }
+#post_touite {
+	position: absolute;
+	left:-1000px;
+	background: transparent;
+    border: none;
+    -webkit-appearance: none; box-shadow: none !important;
+}
+:-webkit-autofill { color: #fff !important; }
 
+#post_content {
+	font-family: 'Petit Formal Script', cursive;
+	font-size: 62px;
+}
+#post_content:after {
+	content: "|";
+	font-size: 80px;
+	font-weight: 100;
+	text-decoration: blink;
+}
 .hidden-block {
 	display: none;
 }
@@ -38,7 +60,6 @@ video {
     box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
     transition: opacity .5s, box-shadow .5s;
 	-webkit-transition: opacity .5s;
-
 }
 .wall-box:hover {
 	opacity: 1;
@@ -47,6 +68,20 @@ video {
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.3);
     cursor: pointer;
 }
+
+#screen-3 {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index:-1;
+	min-width: 100%;
+	min-height: 100%;
+	background-color: white;
+	padding:40px;
+	opacity: 0.9;
+}
+
+
 .label,.glyphicon { margin-right:5px; }
 
 .form-signin
