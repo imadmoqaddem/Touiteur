@@ -2,14 +2,63 @@
 var Touiteur_Utilities = (function(){
 
 	var Json = (function(){
-		var decode_rec = function(input, i, i_max, obj){
-			
+			var decode_rec = function(input, obj){
+			while (input.length != 0)
+			{
+				console.log("Beginning of Parsing : " + input + " ! ");
+				input = $.trim(input);
+				if (input[0] == '}')
+				{
+					console.log("Returning From Recursive Call in " + tag + " ! " + input.substring(1));
+					return input.substring(1);
+				}
+				var nextChar = input.substring(1).indexOf(":");
+				if (nextChar++ == -1)
+					return -3;
+				var tag = $.trim(input.substring(1, nextChar++));
+				input = $.trim(input.substring(nextChar));
+				if (input[0] == '{')
+				{
+					obj[tag] = {};
+					console.log("!!! Recursive call in object " + tag + " !!!" + input);
+					input = decode_rec(input, obj[tag]);
+					if (!isNaN(parseInt(input)))
+					{
+						console.log("!!! Recursive Call FAILED : Error " + parseInt(input));
+						return input;
+					}
+					console.log("!!! Recursive call DONE in object " + tag + " !!! " + input + " ## ");
+				}
+				else
+				{
+					nextChar = input.indexOf('"');
+					if (nextChar++ == -1)
+						return -4;
+					input = input.substring(nextChar);
+					nextChar = input.indexOf('"');
+					if (nextChar++ == -1)
+						return -5;
+					content = input.substring(0, nextChar - 1);
+					input = input.substring(nextChar);
+					obj[tag] = content;
+					console.log(">>> Insertion of tag #" + tag + "# with content #" + content + "# in object <<<");
+					console.log(obj);
+				}
+			}
+			return input;
 		};
 
 		var decode = function(str){
+			var debug_func = console.log;
+			if (touiteur_debug == false)
+			{
+				console.log = function(){};
+			}
 			var res = {};
-			var i_max = str.length;
-			var i = 0;
+			var status = decode_rec(str, res);
+			if (!isNaN(parseInt(status)))
+				console.error("Touiteur: JSON: Error Code " + status);
+			console.log = debug_func;
 			return res;
 		};
 
@@ -19,7 +68,7 @@ var Touiteur_Utilities = (function(){
 	})();
 
 	var Xml = (function(){
-			var decode_rec = function(input, obj, closing){
+			var decode_rec = function(input, obj){
 			while (input.length != 0)
 			{
 				console.log("Beginning of Parsing : " + input + " ! ");
@@ -260,10 +309,10 @@ var Touiteur = (function(){
 
 
 $(document).ready(function() { 
-	touiteur_debug = false;
+	touiteur_debug = true;
 	initScreen = 'signin';
 	Touiteur.init(initScreen);
-	console.log(Touiteur_Utilities.Json.decode('{ yo : "mama" }'));
+	//console.log(Touiteur_Utilities.Json.decode('{yo:{yo2:{yo3:"mama"},imad:"yeah"}}'));
 	//console.log(Touiteur_Utilities.Xml.decode('<yo>qsd</yo><yo2>mama</yo2><yo6><yo4><yo3><imad>mama</imad></yo3></yo4></yo6><yo5>//<![CDATA[yeah//]]></yo5><yo10><yo9>qsd</yo9></yo10>'));
 	//console.log(Touiteur_Utilities.Xml.decode('<?xml version="1.0" encoding="utf-8"?><root><api_version>1.0</api_version><success>true</success><message></message><data><user><id>37</id><token>qsdqsd</token></user></data></root>'));
 });
