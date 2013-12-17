@@ -1,6 +1,7 @@
 var Touiteur = (function(){
 
 	var touiteur_api = "http://touiteur.3ie.fr/";
+	var touiteur_img_dir = touiteur_api + "upload/";
 	var api = {
 		signin: {
 			url: touiteur_api + "api/user/login",
@@ -75,15 +76,6 @@ var Touiteur = (function(){
 			poster:'img/paris.jpg'
 		});
 		*/
-
-		// initialize
-		$wall_touites.masonry({
-		  columnWidth: 300,
-		  itemSelector: '.wall-box',
-		  gutter: 30,
-		  isFitWidth: true,
-		  isInitLayout: false
-		});
 		
 		$signup.on('submit', function(e){
 			e.preventDefault();
@@ -183,19 +175,32 @@ var Touiteur = (function(){
 					console.log(res);
 					$wall_touites.html('');
 					var t = res.data.tweets;
+					var boxes = "";
 					for (p in t)
 					{
-						$wall_touites.append(
+						var date = new Date(parseInt(t[p].date) * 1000);
+						var date_str = $.format.prettyDate(date);
+						boxes +=
 							'<div class="wall-box">'+
 			                	'<blockquote>' +
 			                      '<p>' + t[p].content + '</p>' +
-			                      '<small>By <span class="text-danger">' + t[p].author_login + '</span> <span class="text-info">Monday, 12am</span></small>' +
-			                    '</blockquote>' +
-			                    '<img src="img/touites/t0.jpg" class="img-thumbnail">' +
-			                '</div>'
-			                );
+			                      '<small>By <span class="text-danger">' + t[p].author_login + '</span> <span class="text-info">'+
+			                      date_str + '</span></small>' +
+			                    '</blockquote>';
+			            if (t[p].image_url != "")
+			            	boxes += '<img src="' + touiteur_img_dir + t[p].image_url + '" class="img-thumbnail">';
+			            boxes += '</div>';
 					}
-					$wall_touites.data('masonry').layout();
+					var msnry = $wall_touites.data('masonry');
+					if (msnry != undefined)
+						msnry.masonry('destroy');
+					$wall_touites.append(boxes).masonry({
+					  columnWidth: 300,
+					  itemSelector: '.wall-box',
+					  gutter: 30,
+					  isFitWidth: true,
+					  isInitLayout: true
+					});
 				}).fail(function(data){
 					notify('error', 'Error while Fetching Public Touites !');
 				});
