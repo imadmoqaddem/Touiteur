@@ -19,28 +19,6 @@ video {
 	min-width: 100%;
 	min-height: 100%;
 }
-#post_touite {
-	position: absolute;
-	left:-1000px;
-	background: transparent;
-    border: none;
-    -webkit-appearance: none; box-shadow: none !important;
-}
-:-webkit-autofill { color: #fff !important; }
-
-#post_content {
-	font-family: 'Petit Formal Script', cursive;
-	font-size: 62px;
-}
-#post_content:after {
-	content: "|";
-	font-size: 80px;
-	font-weight: 100;
-	text-decoration: blink;
-}
-.hidden-block {
-	display: none;
-}
 
 .color-touiteur {
 	color:#E74C3C;
@@ -87,7 +65,7 @@ video {
 .form-signin
 {
     max-width: 330px;
-    padding: 15px;
+    padding: 0 15px;
     margin: 0 auto;
 }
 .form-signin .form-signin-heading, .form-signin .checkbox
@@ -149,13 +127,35 @@ video {
 }
 .profile-img
 {
-    width: 96px;
-    height: 96px;
+    width: 64px;
+    height: 64px;
     margin: 0 auto 10px;
     display: block;
     -moz-border-radius: 50%;
     -webkit-border-radius: 50%;
     border-radius: 50%;
+}
+.profile-name {
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    margin: 10px 0 0;
+    height: 1em;
+}
+.profile-email {
+    display: block;
+    padding: 0 8px;
+    font-size: 15px;
+    color: #404040;
+    line-height: 2;
+    font-size: 14px;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
 }
 .need-help
 {
@@ -165,4 +165,17 @@ video {
 {
     display: block;
     margin-top: 10px;
+}
+
+
+
+
+
+
+
+
+
+
+.hidden-block {
+	display: none;
 }
