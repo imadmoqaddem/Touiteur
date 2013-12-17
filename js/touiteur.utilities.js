@@ -2,11 +2,21 @@ var Touiteur_Utilities = (function(){
 
 	var Json = (function(){
 			var decode_rec = function(input, obj){
+			input = $.trim(input);
+			var list = input[0] == "[";
+			if (list)
+				input = input.substring(1);
+			var id = -1;
 			while (input.length != 0)
 			{
-				console.log("Beginning of Parsing : " + input + " ! ");
 				input = $.trim(input);
-				if (input[0] == '}')
+				if (input[0] == ",")
+					input = input.substring(1);
+				console.log("Beginning of Parsing : list("+list+") " + input + " ! ");
+				input = $.trim(input);
+				if (list && input[0] == '{')
+					obj[++id] = {};
+				if ((list && input[0] == ']') || (!list && input[0] == '}'))
 				{
 					console.log("Returning From Recursive Call in " + tag + " ! " + input.substring(1));
 					return input.substring(1);
@@ -20,7 +30,7 @@ var Touiteur_Utilities = (function(){
 				if (tag[tag.length - 1] == '"')
 					tag = tag.substring(0, tag.length - 1);
 				input = $.trim(input.substring(nextChar));
-				if (input[0] == '{')
+				if (input[0] == '{' || input[0] == '[')
 				{
 					obj[tag] = {};
 					console.log("!!! Recursive call in object " + tag + " !!!" + input);
@@ -35,12 +45,12 @@ var Touiteur_Utilities = (function(){
 				else
 				{
 					var nextDelim = input.indexOf(',');
-					if (nextDelim == -1)
-						nextDelim = input.indexOf('}');
-					if (nextDelim == -1)
+					var nextDelim2 = input.indexOf('}');
+					if (nextDelim == -1 && nextDelim2 == -1)
 						return -6;
+					nextDelim = (nextDelim == -1) ? nextDelim2 : ((nextDelim2 == -1) ? nextDelim : Math.min(nextDelim, nextDelim2));
 					nextChar = input.indexOf('"');
-					if (nextDelim < nextChar)
+					if (nextDelim < nextChar || nextChar == -1)
 						nextChar = nextDelim + 1;
 					else
 					{
@@ -53,9 +63,14 @@ var Touiteur_Utilities = (function(){
 					}
 					content = input.substring(0, nextChar - 1);
 					input = input.substring(nextChar);
-					obj[tag] = content;
+					if (list)
+						obj[id][tag] = content;
+					else
+						obj[tag] = content;
 					console.log(">>> Insertion of tag #" + tag + "# with content #" + content + "# in object <<<");
 					console.log(obj);
+					if (input[0] == "}")
+						input = input.substring(1);
 				}
 			}
 			return input;

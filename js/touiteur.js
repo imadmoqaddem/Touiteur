@@ -16,6 +16,11 @@ var Touiteur = (function(){
 			url: touiteur_api + "api/user/details",
 			req_type: "GET",
 			res_type: "text" // JSON
+		},
+		public_touites: {
+			url: touiteur_api + "api/touite/get_publics",
+			req_type: "GET",
+			res_type: "text" // JSON
 		}
 	};
 
@@ -31,7 +36,7 @@ var Touiteur = (function(){
 
 	$post_content = $('#post_content');
 	$post_touite = $('#post_touite');
-	$wall = $('.wall');
+	$wall_touites = $('#screen-2');
 	$navbar = $('#navbar');
 	$signup = $('#touiteur-signup');
 	$signin = $('#touiteur-signin');
@@ -72,7 +77,7 @@ var Touiteur = (function(){
 		*/
 
 		// initialize
-		$wall.masonry({
+		$wall_touites.masonry({
 		  columnWidth: 300,
 		  itemSelector: '.wall-box',
 		  gutter: 30,
@@ -164,7 +169,36 @@ var Touiteur = (function(){
 				renderTab('signin');
 				break;
 			case "home":
-				$wall.data('masonry').layout();
+				$.ajax({
+					type: api['public_touites']['req_type'],
+					url: api['public_touites']['url'],
+					dataType: api['public_touites']['res_type'],
+					data: {
+						token: $.cookie('touiteur_token'),
+						item_by_page: 10,
+						page: 1
+					}
+				}).done(function(data){
+					var res = Touiteur_Utilities.Json.decode(data);
+					console.log(res);
+					$wall_touites.html('');
+					var t = res.data.tweets;
+					for (p in t)
+					{
+						$wall_touites.append(
+							'<div class="wall-box">'+
+			                	'<blockquote>' +
+			                      '<p>' + t[p].content + '</p>' +
+			                      '<small>By <span class="text-danger">' + t[p].author_login + '</span> <span class="text-info">Monday, 12am</span></small>' +
+			                    '</blockquote>' +
+			                    '<img src="img/touites/t0.jpg" class="img-thumbnail">' +
+			                '</div>'
+			                );
+					}
+					$wall_touites.data('masonry').layout();
+				}).fail(function(data){
+					notify('error', 'Error while Fetching Public Touites !');
+				});
 			break;
 			case "post":
     			
@@ -223,6 +257,9 @@ $(document).ready(function() {
 	initScreen = 'signin';
 	Touiteur.init(initScreen);
 	//console.log(Touiteur_Utilities.Json.decode('{yo:{yo2:{yo3:"mama"},imad:"yeah"}}'));
+	touiteur_debug = true;
+	//console.log(Touiteur_Utilities.Json.decode('{"api_version":"1.0","success":true,"message":"","data":{"tweets":[{"content":"Go dodo..","date":1387240854},{"content":"Go dodo..","date":1387240854}]}'));
+	//console.log(Touiteur_Utilities.Json.decode('[{"content":"Go dodo..","date":1387240854},{"content":"Go dodo..","date":1387240854},{"content":"Go dodo..","date":1387240854}]'));
 	//console.log(Touiteur_Utilities.Xml.decode('<yo>qsd</yo><yo2>mama</yo2><yo6><yo4><yo3><imad>mama</imad></yo3></yo4></yo6><yo5><![CDATA[yeah]]></yo5><yo10><yo9>qsd</yo9></yo10>'));
 	//console.log(Touiteur_Utilities.Xml.decode('<?xml version="1.0" encoding="utf-8"?><root><api_version><![CDATA[1ffcb886de03e1d984e81e210febdef2]]></api_version><success>true</success><message></message><data><user><id>37</id><token>qsdqsd</token></user></data></root>'));
 });
