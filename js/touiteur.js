@@ -1,7 +1,7 @@
 var Touiteur = (function(){
 
 	var touiteur_api = "http://touiteur.3ie.fr/";
-	var touiteur_img_dir = touiteur_api + "upload/";
+	var touiteur_img_dir = touiteur_api + "content/upload/";
 	var api = {
 		signin: {
 			url: touiteur_api + "api/user/login",
@@ -37,7 +37,10 @@ var Touiteur = (function(){
 
 	$post_content = $('#post_content');
 	$post_touite = $('#post_touite');
-	$wall_touites = $('#screen-2');
+	$wall_touites = $('#screen-2-wall');
+	$load_more_touites = $('#load-more-touites');
+	touites_page_nb_items = 10;
+	touites_page = 1;
 	$navbar = $('#navbar');
 	$signup = $('#touiteur-signup');
 	$signin = $('#touiteur-signin');
@@ -119,6 +122,12 @@ var Touiteur = (function(){
 			});
 		});
 
+		$load_more_touites.on('click', function(){
+			touites_page++;
+			load_touites();
+			$('html, body').scrollTo($load_more_touites, 100);
+		});
+
 		$post_touite.charCounter(144,{container: "#poste_counter"});
 	}
 
@@ -161,49 +170,8 @@ var Touiteur = (function(){
 				renderTab('signin');
 				break;
 			case "home":
-				$.ajax({
-					type: api['public_touites']['req_type'],
-					url: api['public_touites']['url'],
-					dataType: api['public_touites']['res_type'],
-					data: {
-						token: $.cookie('touiteur_token'),
-						item_by_page: 10,
-						page: 1
-					}
-				}).done(function(data){
-					var res = Touiteur_Utilities.Json.decode(data);
-					console.log(res);
-					$wall_touites.html('');
-					var t = res.data.tweets;
-					var boxes = "";
-					for (p in t)
-					{
-						var date = new Date(parseInt(t[p].date) * 1000);
-						var date_str = $.format.prettyDate(date);
-						boxes +=
-							'<div class="wall-box">'+
-			                	'<blockquote>' +
-			                      '<p>' + t[p].content + '</p>' +
-			                      '<small>By <span class="text-danger">' + t[p].author_login + '</span> <span class="text-info">'+
-			                      date_str + '</span></small>' +
-			                    '</blockquote>';
-			            if (t[p].image_url != "")
-			            	boxes += '<img src="' + touiteur_img_dir + t[p].image_url + '" class="img-thumbnail">';
-			            boxes += '</div>';
-					}
-					var msnry = $wall_touites.data('masonry');
-					if (msnry != undefined)
-						msnry.masonry('destroy');
-					$wall_touites.append(boxes).masonry({
-					  columnWidth: 300,
-					  itemSelector: '.wall-box',
-					  gutter: 30,
-					  isFitWidth: true,
-					  isInitLayout: true
-					});
-				}).fail(function(data){
-					notify('error', 'Error while Fetching Public Touites !');
-				});
+				touites_page = 1;
+				load_touites();
 			break;
 			case "post":
     			
@@ -241,6 +209,55 @@ var Touiteur = (function(){
 			);
 		}).fail(function(data){
 			notify('error', 'Error while Fetching User Details !');
+		});
+	}
+
+	var load_touites = function(){
+		$.ajax({
+			type: api['public_touites']['req_type'],
+			url: api['public_touites']['url'],
+			dataType: api['public_touites']['res_type'],
+			data: {
+				token: $.cookie('touiteur_token'),
+				item_by_page: touites_page_nb_items,
+				page: touites_page
+			}
+		}).done(function(data){
+			var res = Touiteur_Utilities.Json.decode(data);
+			console.log(res);
+			var t = res.data.tweets;
+			var boxes = "";
+			for (p in t)
+			{
+				var date = new Date(parseInt(t[p].date) * 1000);
+				var date_str = $.format.prettyDate(date);
+				boxes +=
+					'<div class="wall-box">'+
+	                	'<blockquote>' +
+	                      '<p>' + t[p].content + '</p>' +
+	                      '<small>By <span class="text-danger">' + t[p].author_login + '</span> <span class="text-info">'+
+	                      date_str + '</span></small>' +
+	                    '</blockquote>';
+	            if (t[p].image_url != "")
+	            	boxes += '<img src="' + touiteur_img_dir + t[p].image_url + '" class="img-thumbnail">';
+	            boxes += '</div>';
+			}
+			var msnry = $wall_touites.data('masonry');
+			console.log(msnry);
+			if (msnry != undefined)
+				msnry.destroy();
+			$wall_touites.append(boxes).masonry({
+				  columnWidth: 300,
+				  itemSelector: '.wall-box',
+				  gutter: 30,
+				  isFitWidth: true,
+				  isInitLayout: true
+				});
+			setTimeout(function(){
+				$wall_touites.data('masonry').layout();	
+			}, 300);
+		}).fail(function(data){
+			notify('error', 'Error while Fetching Public Touites !');
 		});
 	}
 

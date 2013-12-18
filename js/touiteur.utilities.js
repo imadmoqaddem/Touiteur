@@ -1,5 +1,13 @@
 var Touiteur_Utilities = (function(){
 
+	var decode_unicode = function(str){
+		var search = /\\u([\d\w]{4})/gi;
+		str = str.replace(search, function (match, grp) {
+		    return String.fromCharCode(parseInt(grp, 16)); } );
+		str = unescape(str);
+		return str;
+	}
+
 	var Json = (function(){
 			var decode_rec = function(input, obj){
 			input = $.trim(input);
@@ -61,7 +69,7 @@ var Touiteur_Utilities = (function(){
 						if (nextChar++ == -1)
 							return -5;
 					}
-					content = input.substring(0, nextChar - 1);
+					content = decode_unicode(input.substring(0, nextChar - 1));
 					input = input.substring(nextChar);
 					if (list)
 						obj[id][tag] = content;
@@ -79,9 +87,7 @@ var Touiteur_Utilities = (function(){
 		var decode = function(str){
 			var debug_func = console.log;
 			if (touiteur_debug == false)
-			{
 				console.log = function(){};
-			}
 			var res = {};
 			var status = decode_rec(str, res);
 			if (!isNaN(parseInt(status)))
@@ -146,7 +152,7 @@ var Touiteur_Utilities = (function(){
 						content = input.substring(0, nextChar - 1);
 						input = input.substring(nextChar + tag.length + 2);
 					}
-					obj[tag] = content;
+					obj[tag] = decode_unicode(content);
 					console.log(">>> Insertion of tag #" + tag + "# with content #" + content + "# in object <<<");
 					console.log(obj);
 				}
@@ -157,9 +163,7 @@ var Touiteur_Utilities = (function(){
 		var decode = function(str){
 			var debug_func = console.log;
 			if (touiteur_debug == false)
-			{
 				console.log = function(){};
-			}
 			var res = {};
 			str = $.trim(str);
 			if (str.indexOf("<?xml") == 0)

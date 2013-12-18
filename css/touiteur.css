@@ -167,7 +167,10 @@ video {
     margin-top: 10px;
 }
 
-
+#load-more-touites {
+	position: absolute;
+	z-index: 10;
+}
 
 
 
