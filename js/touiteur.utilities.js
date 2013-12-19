@@ -4,7 +4,7 @@ var Touiteur_Utilities = (function(){
 		var search = /\\u([\d\w]{4})/gi;
 		str = str.replace(search, function (match, grp) {
 		    return String.fromCharCode(parseInt(grp, 16)); } );
-		str = unescape(str);
+		str = unescape(str.replace(/\\n/g, "<br />"));
 		return str;
 	}
 

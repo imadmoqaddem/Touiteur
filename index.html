@@ -11,6 +11,7 @@
     <link href='http://fonts.googleapis.com/css?family=Petit+Formal+Script&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="css/touiteur.css">
     <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="js/fileupload/css/jquery.fileupload.css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -25,66 +26,23 @@
         <source src="img/background_video.webm" type="video/webm" />
         <source src="img/background_video.ogv" type="video/ogg" />
     </video>
-    
+    <div class="background_pattern">&nbsp;</div>    
     <div id="navbar" class="container hidden-block">
         <nav class="navbar navbar-default" role="navigation">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                    <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span><span
-                        class="icon-bar"></span><span class="icon-bar"></span>
+                    <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span>
+                    <span class="icon-bar"></span><span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#" data-touiteur-goto="home">Touiteur</a>
+                <a class="navbar-brand" href="#" data-touiteur-goto="home"><span class="glyphicon glyphicon-home"></span>Touiteur</a>
             </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <div class="pull-right collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-                    <li class="active"><a href="#"><span class="glyphicon glyphicon-home"></span>Dashboard</a></li>
-                    <li><a href="#"><span class="glyphicon glyphicon-calendar"></span>Calendar</a></li>
-                    <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><span
-                        class="glyphicon glyphicon-list-alt"></span>Widgets <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="http://www.jquery2dotnet.com">Action</a></li>
-                            <li><a href="http://www.jquery2dotnet.com">Another action</a></li>
-                            <li><a href="#">Something else here</a></li>
-                            <li class="divider"></li>
-                            <li><a href="#">Separated link</a></li>
-                            <li class="divider"></li>
-                            <li><a href="#">One more separated link</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><span
-                        class="glyphicon glyphicon-search"></span>Search <b class="caret"></b></a>
-                        <ul class="dropdown-menu" style="min-width: 300px;">
-                            <li>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <form class="navbar-form navbar-left" role="search">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control" placeholder="Search" />
-                                            <span class="input-group-btn">
-                                                <button class="btn btn-primary" type="button">
-                                                    Go!</button>
-                                            </span>
-                                        </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-                <ul class="nav navbar-nav navbar-right">
                     <li><a href="#" data-touiteur-goto="post"><span class="glyphicon glyphicon-pencil"></span>Post</a></li>
-                    <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><span
-                        class="glyphicon glyphicon-user"></span>Admin <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="#"><span class="glyphicon glyphicon-user"></span>Profile</a></li>
-                            <li><a href="#"><span class="glyphicon glyphicon-cog"></span>Settings</a></li>
-                            <li class="divider"></li>
-                            <li><a href="#" data-touiteur-goto="signin"><span class="glyphicon glyphicon-off"></span>Logout</a></li>
-                        </ul>
-                    </li>
+                    <li><a href="#"><span class="glyphicon glyphicon-user"></span>Profile</a></li>
+                    <li><a href="#" data-touiteur-goto="signin"><span class="glyphicon glyphicon-off"></span>Logout</a></li>
                 </ul>
             </div>
             <!-- /.navbar-collapse -->
@@ -237,8 +195,19 @@
     </div>
     
     <div class="container hidden-block" id="screen-3">
-        <textarea class="form-control counted" id="post_touite" placeholder="Type in your message" rows="5" style="margin-bottom:10px;"></textarea>
-        <h6 class="pull-right" id="poste_counter">144 characters remaining</h6>
+        <div class="white-background">&nbsp;</div>
+        <form id="touiteur_submit">
+            <textarea class="form-control counted" placeholder="Type in your message" rows="3" style="font-size:24px; margin-bottom:10px;" name="touite"></textarea>
+            <button class="pull-right btn btn-sm btn-primary" type="submit">
+                Submit</button>
+            <span class="pull-right btn btn-info btn-sm fileinput-button">
+                <i class="glyphicon glyphicon-picture"></i>
+                <span>Add Image</span>
+                <!-- The file input field used as target for the file upload widget -->
+                <input id="fileupload" type="file" name="image">
+            </span>
+            <h4 class="pull-right" id="poste_counter">140 characters remaining</h4>
+        </form>
     </div>
 
 
@@ -249,27 +218,33 @@
     <script src="js/bootstrap.min.js"></script>
     <!--<script src="js/jquery.videoBG.js"></script>-->
 
-  <script src="js/noty/jquery.noty.js"></script>
-  <script src="js/jquery.scrollto.js"></script>
-  <script src="js/jquery.charcounter.js"></script>
-  <script src="js/jquery.dateformat.js"></script>
-  <script src="js/jquery.cookie.js"></script>
-  <script src="js/masonry.js"></script>
-  
-  <script src="js/noty/layouts/bottom.js"></script>
-  <script src="js/noty/layouts/bottomCenter.js"></script>
-  <script src="js/noty/layouts/bottomLeft.js"></script>
-  <script src="js/noty/layouts/bottomRight.js"></script>
-  <script src="js/noty/layouts/center.js"></script>
-  <script src="js/noty/layouts/centerLeft.js"></script>
-  <script src="js/noty/layouts/centerRight.js"></script>
-  <script src="js/noty/layouts/inline.js"></script>
-  <script src="js/noty/layouts/top.js"></script>
-  <script src="js/noty/layouts/topCenter.js"></script>
-  <script src="js/noty/layouts/topLeft.js"></script>
-  <script src="js/noty/layouts/topRight.js"></script>
+    <script src="js/fileupload/js/vendor/jquery.ui.widget.js"></script>
+    <!-- The Iframe Transport is required for browsers without support for XHR file uploads -->
+    <script src="js/fileupload/js/jquery.iframe-transport.js"></script>
+    <!-- The basic File Upload plugin -->
+    <script src="js/fileupload/js/jquery.fileupload.js"></script>
 
-  <script src="js/noty/themes/default.js"></script>
+      <script src="js/noty/jquery.noty.js"></script>
+      <script src="js/jquery.scrollto.js"></script>
+      <script src="js/jquery.charcounter.js"></script>
+      <script src="js/jquery.dateformat.js"></script>
+      <script src="js/jquery.cookie.js"></script>
+      <script src="js/masonry.js"></script>
+      
+      <script src="js/noty/layouts/bottom.js"></script>
+      <script src="js/noty/layouts/bottomCenter.js"></script>
+      <script src="js/noty/layouts/bottomLeft.js"></script>
+      <script src="js/noty/layouts/bottomRight.js"></script>
+      <script src="js/noty/layouts/center.js"></script>
+      <script src="js/noty/layouts/centerLeft.js"></script>
+      <script src="js/noty/layouts/centerRight.js"></script>
+      <script src="js/noty/layouts/inline.js"></script>
+      <script src="js/noty/layouts/top.js"></script>
+      <script src="js/noty/layouts/topCenter.js"></script>
+      <script src="js/noty/layouts/topLeft.js"></script>
+      <script src="js/noty/layouts/topRight.js"></script>
+
+      <script src="js/noty/themes/default.js"></script>
 
     <script src="js/touiteur.utilities.js"></script>
     <script src="js/touiteur.js"></script>

@@ -22,6 +22,11 @@ var Touiteur = (function(){
 			url: touiteur_api + "api/touite/get_publics",
 			req_type: "GET",
 			res_type: "text" // JSON
+		},
+		submit_touite: {
+			url: touiteur_api + "api/touite/submit",
+			req_type: "POST",
+			res_type: "text" // JSON
 		}
 	};
 
@@ -36,9 +41,12 @@ var Touiteur = (function(){
 	var screen_old = screens.signin;
 
 	$post_content = $('#post_content');
-	$post_touite = $('#post_touite');
+	$submit_touite = $('#touiteur_submit');
 	$wall_touites = $('#screen-2-wall');
 	$load_more_touites = $('#load-more-touites');
+	wall_refresh_id = 0;
+	touites_first_id = -1;
+	touites_last_id = -1;
 	touites_page_nb_items = 10;
 	touites_page = 1;
 	$navbar = $('#navbar');
@@ -125,10 +133,62 @@ var Touiteur = (function(){
 		$load_more_touites.on('click', function(){
 			touites_page++;
 			load_touites();
-			$('html, body').scrollTo($load_more_touites, 100);
+			$(window).scrollTo($load_more_touites, 100);
 		});
 
-		$post_touite.charCounter(144,{container: "#poste_counter"});
+		$submit_touite.find('textarea[name=touite]').charCounter(140,{container: "#poste_counter"});
+		$('#fileupload').fileupload({
+		    dataType: 'text',
+		    forceIframeTransport: true,
+		    url: api['submit_touite']['url'],
+		    acceptFileTypes: /(\.|\/)(jpe?g|png)$/i,
+		    maxNumberOfFiles: 1,
+		    formData: function(){
+				return [{
+						name: 'token',
+						value: $.cookie('touiteur_token')
+					},
+					{
+						name: 'content',
+						value: $submit_touite.find('textarea[name=touite]').val()
+					}];
+			},
+	        add: function (e, data) {
+	        	$submit_touite.off('submit.touiteur');
+	            data.context = $submit_touite.on('submit.touiteur', function(e){
+	                    e.preventDefault();
+	           	        data.submit();
+	                });
+	        },
+	        done: function (e, data) {
+	        	$submit_touite.off('submit.touiteur');
+	        	notify('success', 'Touite Successfully Posted !');
+				$submit_touite.on('submit.touiteur', submitSimpleTouite);
+	        },
+	        fail: function (e, data) {
+	            notify('error', 'Error while Posting your Touite !');
+	        },
+	        always: function (e, data) {
+	        }
+		});
+		$submit_touite.on('submit.touiteur', submitSimpleTouite);
+	}
+
+	var submitSimpleTouite = function(e){
+		e.preventDefault();
+		$.ajax({
+			type: api['submit_touite']['req_type'],
+			url: api['submit_touite']['url'],
+			dataType: api['submit_touite']['res_type'],
+			data: {
+				token: $.cookie('touiteur_token'),
+				content: $submit_touite.find('textarea[name=touite]').val()
+			}
+		}).done(function(data){
+			notify('success', 'Touite Successfully Posted !');
+		}).fail(function(data){
+            notify('error', 'Error while Posting your Touite !');
+		});
 	}
 
 	var renderTab = function(screen)
@@ -142,6 +202,8 @@ var Touiteur = (function(){
 			$navbar.show();
 		else
 			$navbar.hide();
+		if (screen != "home")
+			clearInterval(wall_refresh_id);
 		switch (screen)
 		{
 			case "signin":
@@ -170,11 +232,14 @@ var Touiteur = (function(){
 				renderTab('signin');
 				break;
 			case "home":
-				touites_page = 1;
-				load_touites();
+				load_touites('new');
+				clearInterval(wall_refresh_id);
+				wall_refresh_id = setInterval(function(){
+					load_touites('new');
+				}, 30 * 1000);
 			break;
 			case "post":
-    			
+				$submit_touite.find('textarea[name=touite]').val('');
 			break;
 		}
 	}
@@ -212,7 +277,7 @@ var Touiteur = (function(){
 		});
 	}
 
-	var load_touites = function(){
+	var load_touites = function(new_touites){
 		$.ajax({
 			type: api['public_touites']['req_type'],
 			url: api['public_touites']['url'],
@@ -220,15 +285,32 @@ var Touiteur = (function(){
 			data: {
 				token: $.cookie('touiteur_token'),
 				item_by_page: touites_page_nb_items,
-				page: touites_page
+				page: (new_touites != undefined) ? 1 : touites_page
 			}
 		}).done(function(data){
 			var res = Touiteur_Utilities.Json.decode(data);
 			console.log(res);
 			var t = res.data.tweets;
 			var boxes = "";
+			var first_id = Infinity;
+			var last_id = -1;
 			for (p in t)
 			{
+				if (first_id == Infinity)
+					first_id = parseInt(t[p].id);
+				last_id = parseInt(t[p].id);
+				if (new_touites != undefined)
+				{
+					console.log(">>1 First id : " + touites_first_id + " . " + first_id + "; " + touites_last_id + " . " + last_id);
+					if (last_id <= touites_first_id)
+						break;
+				}
+				else
+				{
+					console.log(">>2 First id : " + touites_first_id + " . " + first_id + "; " + touites_last_id + " . " + last_id);
+					if (last_id >= touites_last_id)
+						continue;
+				}
 				var date = new Date(parseInt(t[p].date) * 1000);
 				var date_str = $.format.prettyDate(date);
 				boxes +=
@@ -242,11 +324,20 @@ var Touiteur = (function(){
 	            	boxes += '<img src="' + touiteur_img_dir + t[p].image_url + '" class="img-thumbnail">';
 	            boxes += '</div>';
 			}
+			if (new_touites != undefined)
+			{
+				touites_first_id = first_id;
+				$wall_touites.prepend(boxes);
+			}
+			else
+			{
+				touites_last_id = last_id;
+				$wall_touites.append(boxes);
+			}
 			var msnry = $wall_touites.data('masonry');
-			console.log(msnry);
 			if (msnry != undefined)
 				msnry.destroy();
-			$wall_touites.append(boxes).masonry({
+			$wall_touites.masonry({
 				  columnWidth: 300,
 				  itemSelector: '.wall-box',
 				  gutter: 30,
@@ -255,7 +346,7 @@ var Touiteur = (function(){
 				});
 			setTimeout(function(){
 				$wall_touites.data('masonry').layout();	
-			}, 300);
+			}, 500);
 		}).fail(function(data){
 			notify('error', 'Error while Fetching Public Touites !');
 		});
