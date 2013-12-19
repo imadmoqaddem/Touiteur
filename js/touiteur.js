@@ -301,6 +301,7 @@ var Touiteur = (function(){
 				last_id = parseInt(t[p].id);
 				if (new_touites != undefined)
 				{
+					//>>1 First id : 182 . 182; 163 . 182 
 					console.log(">>1 First id : " + touites_first_id + " . " + first_id + "; " + touites_last_id + " . " + last_id);
 					if (last_id <= touites_first_id)
 						break;
@@ -330,9 +331,12 @@ var Touiteur = (function(){
 				$wall_touites.prepend(boxes);
 			}
 			else
-			{
-				touites_last_id = last_id;
 				$wall_touites.append(boxes);
+			if (touites_last_id == -1 || new_touites == undefined)
+				touites_last_id = last_id;
+			if (boxes == ""){
+				$load_more_touites.trigger('click');
+				return;
 			}
 			var msnry = $wall_touites.data('masonry');
 			if (msnry != undefined)
@@ -344,9 +348,9 @@ var Touiteur = (function(){
 				  isFitWidth: true,
 				  isInitLayout: true
 				});
-			setTimeout(function(){
+			$('img').load(function(){
 				$wall_touites.data('masonry').layout();	
-			}, 500);
+			});
 		}).fail(function(data){
 			notify('error', 'Error while Fetching Public Touites !');
 		});
