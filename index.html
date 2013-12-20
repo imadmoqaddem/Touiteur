@@ -202,17 +202,20 @@
                 Submit</button>
             <span class="pull-right btn btn-info btn-sm fileinput-button">
                 <i class="glyphicon glyphicon-picture"></i>
-                <span>Add Image</span>
+                <span>Image</span>
                 <!-- The file input field used as target for the file upload widget -->
                 <input id="fileupload" type="file" name="image">
             </span>
             <a href="#" class="pull-right btn btn-info btn-sm" id="touite_add_location">
                 <i class="glyphicon glyphicon-map-marker"></i>
-                <span>Add Localisation</span>
+                <span>Position</span>
             </a>
             <h4 class="pull-right" id="poste_counter">140 characters remaining</h4>
         </form>
-        <div id="map">&nbsp;</div>
+        <span class="clearfix"></span>
+        <div id="map-container" class="wall-box">
+            <div id="map"></div>
+        </div>
     </div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
@@ -248,8 +251,6 @@
       <script src="js/noty/layouts/topRight.js"></script>
 
       <script src="js/noty/themes/default.js"></script>
-
-      <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=true"></script>
 
     <script src="js/touiteur.utilities.js"></script>
     <script src="js/touiteur.js"></script>

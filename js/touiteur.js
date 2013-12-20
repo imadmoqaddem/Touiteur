@@ -52,17 +52,7 @@ var Touiteur = (function(){
 	touites_page = 1;
 	$touite_add_location = $('#touite_add_location');
 	
-	// Position par défaut
-	var centerpos = new google.maps.LatLng(48.579400,7.7519);
-
-	// Ansi que des options pour la carte, centrée sur latlng
-	var optionsGmaps = {
-		center:centerpos,
-		navigationControlOptions: {style: google.maps.NavigationControlStyle.SMALL},
-		mapTypeId: google.maps.MapTypeId.ROADMAP,
-		zoom: 15
-	};
-	var map = new google.maps.Map(document.getElementById('map'), optionsGmaps);
+	$map = $("#map-container");
 	
 	$navbar = $('#navbar');
 	$signup = $('#touiteur-signup');
@@ -405,14 +395,10 @@ var Touiteur = (function(){
 
 		// On instancie un nouvel objet LatLng pour Google Maps
 		var latlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-
-		// Ajout d'un marqueur à la position trouvée
-		var marker = new google.maps.Marker({
-			position: latlng,
-			map: map,
-			title:"I am Here !"
-		});
-		map.panTo(latlng);
+		var map_url = "http://maps.googleapis.com/maps/api/staticmap?"
+					+ "center="+position.coords.latitude+","+position.coords.longitude+"&zoom=14&size=400x400&sensor=false"
+					+ "&markers=color:#0xE74C3C%7Clabel:"+get_user_details()[1]+"%7C"+position.coords.latitude+","+position.coords.longitude;
+		$map.find('#map').html('<img src="'+map_url+'" class="img-thumbnail" />');
 	}
 
 	// Fonction de callback en cas d’erreur
