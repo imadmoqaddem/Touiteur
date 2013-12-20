@@ -35,7 +35,8 @@ var Touiteur = (function(){
 		signin_new: { container: "#screen-0", navbar: false },
 		signup: { container: "#screen-1", navbar: false },
 		home: { container: "#screen-2", navbar: true },
-		post: { container: "#screen-3", navbar: true }
+		post: { container: "#screen-3", navbar: true },
+		profile: { container: "#screen-4", navbar: true }
 	};
 	var screen_current;
 	var screen_old = screens.signin;
@@ -49,6 +50,7 @@ var Touiteur = (function(){
 	touites_last_id = -1;
 	touites_page_nb_items = 10;
 	touites_page = 1;
+	$touite_add_location = $('#touite_add_location');
 	$navbar = $('#navbar');
 	$signup = $('#touiteur-signup');
 	$signin = $('#touiteur-signin');
@@ -63,8 +65,13 @@ var Touiteur = (function(){
 
 	var initNav = function()
 	{
-		$("[data-touiteur-goto]").on('click', function(){
-			renderTab($(this).data('touiteur-goto'));
+		$("body").on('click', '[data-touiteur-goto]', function(e){
+			e.preventDefault();
+			var screen = $(this).data('touiteur-goto');
+			if (screen == "profile")
+				renderTab(screen, { id: $(this).data('touiteur-profile') });
+			else
+				renderTab(screen);
 		});
 	}
 
@@ -172,6 +179,9 @@ var Touiteur = (function(){
 	        }
 		});
 		$submit_touite.on('submit.touiteur', submitSimpleTouite);
+		$touite_add_location.on('click', function(){
+			getUserPosition();
+		});
 	}
 
 	var submitSimpleTouite = function(e){
@@ -191,7 +201,7 @@ var Touiteur = (function(){
 		});
 	}
 
-	var renderTab = function(screen)
+	var renderTab = function(screen, params)
 	{
 		screen_old = screen_current;
 		screen_current = screens[screen];
@@ -240,6 +250,10 @@ var Touiteur = (function(){
 			break;
 			case "post":
 				$submit_touite.find('textarea[name=touite]').val('');
+			break;
+			case "profile":
+				notify('success', "Displaying Profile of User : " + params.id);
+				renderTab("home");
 			break;
 		}
 	}
@@ -318,8 +332,9 @@ var Touiteur = (function(){
 					'<div class="wall-box">'+
 	                	'<blockquote>' +
 	                      '<p>' + t[p].content + '</p>' +
-	                      '<small>By <span class="text-danger">' + t[p].author_login + '</span> <span class="text-info">'+
-	                      date_str + '</span></small>' +
+	                      '<small>By <a href="#" data-touiteur-goto="profile" data-touiteur-profile="' + t[p].author_id + '" class="text-danger">' + 
+	                      t[p].author_login + '</a> '+
+	                      '<span class="text-info">' + date_str + '</span></small>' +
 	                    '</blockquote>';
 	            if (t[p].image_url != "")
 	            	boxes += '<img src="' + touiteur_img_dir + t[p].image_url + '" class="img-thumbnail">';
@@ -334,7 +349,7 @@ var Touiteur = (function(){
 				$wall_touites.append(boxes);
 			if (touites_last_id == -1 || new_touites == undefined)
 				touites_last_id = last_id;
-			if (boxes == ""){
+			if (boxes == "" && new_touites == undefined){
 				$load_more_touites.trigger('click');
 				return;
 			}
@@ -355,6 +370,70 @@ var Touiteur = (function(){
 			notify('error', 'Error while Fetching Public Touites !');
 		});
 	}
+
+	// Position par défaut
+	var centerpos = new google.maps.LatLng(48.579400,7.7519);
+
+	// Ansi que des options pour la carte, centrée sur latlng
+	var optionsGmaps = {
+		center:centerpos,
+		navigationControlOptions: {style: google.maps.NavigationControlStyle.SMALL},
+		mapTypeId: google.maps.MapTypeId.ROADMAP,
+		zoom: 15
+	};
+
+	var getUserPosition = function() {
+		// Initialisation de la carte avec les options
+		var map = new google.maps.Map($("#map"), optionsGmaps);
+
+		if(navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(geolocationSuccess,geolocationError);
+		} else {
+			notify("error", "Geolocation Is Not Supported by Your Navigator");
+		}
+	}
+
+	// Fonction de callback en cas de succès
+	var geolocationSuccess = function(position) {
+	
+		var infopos = "Your Position : <br>";
+		infopos += "Latitude : "+position.coords.latitude +" | ";
+		infopos += "Longitude: "+position.coords.longitude+" | ";
+		infopos += "Altitude : "+position.coords.altitude +" | ";
+		notify("success", infopos);
+
+		// On instancie un nouvel objet LatLng pour Google Maps
+		var latlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+
+		// Ajout d'un marqueur à la position trouvée
+		var marker = new google.maps.Marker({
+			position: latlng,
+			map: map,
+			title:"I am Here !"
+		});
+		map.panTo(latlng);
+	}
+
+	// Fonction de callback en cas d’erreur
+	var geolocationError = function(error) {
+		var info = "Geolocation Error : ";
+		switch(error.code) {
+		case error.TIMEOUT:
+			info += "Timeout !";
+		break;
+		case error.PERMISSION_DENIED:
+			info += "We need your permission in order to publish your geolocation.";
+		break;
+		case error.POSITION_UNAVAILABLE:
+			info += "Position could not be determined.";
+		break;
+		case error.UNKNOWN_ERROR:
+			info += "Unknown Error...";
+		break;
+		}
+		notify("error", info);
+	}
+
 
 	var notify = function(type, msg, layout){
 		if (layout == undefined)
