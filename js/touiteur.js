@@ -387,8 +387,6 @@ var Touiteur = (function(){
 		infopos += "Altitude : "+position.coords.altitude +" | ";
 		notify("success", infopos);
 
-		// On instancie un nouvel objet LatLng pour Google Maps
-		var latlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
 		var map_url = "http://maps.googleapis.com/maps/api/staticmap?"
 					+ "center="+position.coords.latitude+","+position.coords.longitude+"&zoom=14&size=400x400&sensor=false"
 					+ "&markers=color:purple%7C"+position.coords.latitude+","+position.coords.longitude;
