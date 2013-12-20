@@ -398,11 +398,12 @@ var Touiteur = (function(){
 		var map_url = "http://maps.googleapis.com/maps/api/staticmap?"
 					+ "center="+position.coords.latitude+","+position.coords.longitude+"&zoom=14&size=400x400&sensor=false"
 					+ "&markers=color:#0xE74C3C%7Clabel:"+get_user_details()[1]+"%7C"+position.coords.latitude+","+position.coords.longitude;
-		$map.find('#map').html('<img src="'+map_url+'" class="img-thumbnail" />');
+		$map.show().find('#map').html('<img src="'+map_url+'" class="img-thumbnail" />');
 	}
 
 	// Fonction de callback en cas d’erreur
 	var geolocationError = function(error) {
+		$map.hide();
 		var info = "Geolocation Error : ";
 		switch(error.code) {
 		case error.TIMEOUT:
