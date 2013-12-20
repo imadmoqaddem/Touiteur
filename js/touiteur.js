@@ -62,7 +62,7 @@ var Touiteur = (function(){
 		mapTypeId: google.maps.MapTypeId.ROADMAP,
 		zoom: 15
 	};
-	var map = new google.maps.Map($("#map"), {});
+	var map = new google.maps.Map(document.getElementById('map'), optionsGmaps);
 	
 	$navbar = $('#navbar');
 	$signup = $('#touiteur-signup');
