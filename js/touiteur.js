@@ -51,6 +51,19 @@ var Touiteur = (function(){
 	touites_page_nb_items = 10;
 	touites_page = 1;
 	$touite_add_location = $('#touite_add_location');
+	
+	// Position par défaut
+	var centerpos = new google.maps.LatLng(48.579400,7.7519);
+
+	// Ansi que des options pour la carte, centrée sur latlng
+	var optionsGmaps = {
+		center:centerpos,
+		navigationControlOptions: {style: google.maps.NavigationControlStyle.SMALL},
+		mapTypeId: google.maps.MapTypeId.ROADMAP,
+		zoom: 15
+	};
+	var map = new google.maps.Map($("#map"), {});
+	
 	$navbar = $('#navbar');
 	$signup = $('#touiteur-signup');
 	$signin = $('#touiteur-signin');
@@ -371,21 +384,9 @@ var Touiteur = (function(){
 		});
 	}
 
-	// Position par défaut
-	var centerpos = new google.maps.LatLng(48.579400,7.7519);
-
-	// Ansi que des options pour la carte, centrée sur latlng
-	var optionsGmaps = {
-		center:centerpos,
-		navigationControlOptions: {style: google.maps.NavigationControlStyle.SMALL},
-		mapTypeId: google.maps.MapTypeId.ROADMAP,
-		zoom: 15
-	};
-
 	var getUserPosition = function() {
 		// Initialisation de la carte avec les options
-		var map = new google.maps.Map($("#map"), optionsGmaps);
-
+		
 		if(navigator.geolocation) {
 			navigator.geolocation.getCurrentPosition(geolocationSuccess,geolocationError);
 		} else {
