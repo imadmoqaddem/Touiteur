@@ -316,19 +316,10 @@ var Touiteur = (function(){
 				if (first_id == Infinity)
 					first_id = parseInt(t[p].id);
 				last_id = parseInt(t[p].id);
-				if (new_touites != undefined)
-				{
-					//>>1 First id : 182 . 182; 163 . 182 
-					console.log(">>1 First id : " + touites_first_id + " . " + first_id + "; " + touites_last_id + " . " + last_id);
-					if (last_id <= touites_first_id)
-						break;
-				}
-				else
-				{
-					console.log(">>2 First id : " + touites_first_id + " . " + first_id + "; " + touites_last_id + " . " + last_id);
-					if (last_id >= touites_last_id)
-						continue;
-				}
+				if (new_touites != undefined && last_id <= touites_first_id)
+					break;
+				else if (last_id >= touites_last_id)
+					continue;
 				var date = new Date(parseInt(t[p].date) * 1000);
 				var date_str = $.format.prettyDate(date);
 				boxes +=
@@ -393,8 +384,6 @@ var Touiteur = (function(){
 		infopos += "Altitude : "+position.coords.altitude +" | ";
 		notify("success", infopos);
 
-		// On instancie un nouvel objet LatLng pour Google Maps
-		var latlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
 		var map_url = "http://maps.googleapis.com/maps/api/staticmap?"
 					+ "center="+position.coords.latitude+","+position.coords.longitude+"&zoom=14&size=400x400&sensor=false"
 					+ "&markers=color:#0xE74C3C%7Clabel:"+get_user_details()[1]+"%7C"+position.coords.latitude+","+position.coords.longitude;
