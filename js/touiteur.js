@@ -69,7 +69,6 @@ var Touiteur = (function(){
 	var initNav = function()
 	{
 		$("body").on('click', '[data-touiteur-goto]', function(e){
-			e.preventDefault();
 			var screen = $(this).data('touiteur-goto');
 			if (screen == "profile")
 				renderTab(screen, { id: $(this).data('touiteur-profile') });
@@ -97,7 +96,8 @@ var Touiteur = (function(){
 			poster:'img/paris.jpg'
 		});
 		*/
-		
+		$("[data-toggle=tooltip]").tooltip();
+
 		$signup.on('submit', function(e){
 			e.preventDefault();
 			$.ajax({
@@ -140,10 +140,13 @@ var Touiteur = (function(){
 			});
 		});
 
-		$load_more_touites.on('click', function(){
+		$load_more_touites.on('click', function(e){
+			e.preventDefault();
 			touites_page++;
-			load_touites();
-			$(window).scrollTo($load_more_touites, 100);
+			load_touites(undefined, function(){
+				$(window).scrollTo($load_more_touites, 100);
+				$('html, body').scrollTo($load_more_touites, 100);
+			});
 		});
 
 		$submit_touite.find('textarea[name=touite]').charCounter(140,{container: "#poste_counter"});
@@ -294,7 +297,7 @@ var Touiteur = (function(){
 		});
 	}
 
-	var load_touites = function(new_touites){
+	var load_touites = function(new_touites, callback){
 		$.ajax({
 			type: api['public_touites']['req_type'],
 			url: api['public_touites']['url'],
@@ -361,7 +364,9 @@ var Touiteur = (function(){
 				  isInitLayout: true
 				});
 			$('img').load(function(){
-				$wall_touites.data('masonry').layout();	
+				$wall_touites.data('masonry').layout();
+				if (callback != undefined)
+					callback();
 			});
 		}).fail(function(data){
 			notify('error', 'Error while Fetching Public Touites !');
@@ -417,7 +422,7 @@ var Touiteur = (function(){
 
 	var notify = function(type, msg, layout){
 		if (layout == undefined)
-			layout = "top";
+			layout = "bottom";
 		var n = noty({type:type, text: msg, layout:layout});
 	}
 

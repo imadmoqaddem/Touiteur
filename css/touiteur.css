@@ -2,7 +2,8 @@
 font-family: 'Petit Formal Script', cursive;
 */
 
-body { 
+body {
+  padding-top: 70px;
   background: url(../img/paris.jpg) no-repeat center center fixed; 
   -webkit-background-size: cover;
   -moz-background-size: cover;
