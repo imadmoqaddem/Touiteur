@@ -5,6 +5,10 @@ var Touiteur_Utilities = (function(){
 		str = str.replace(search, function (match, grp) {
 		    return String.fromCharCode(parseInt(grp, 16)); } );
 		str = unescape(str.replace(/\\n/g, "<br />"));
+		
+		search = /\\(.){1}/g;
+		str = str.replace(search, function (match, grp) {
+		    return grp; } );
 		return str;
 	}
 
@@ -66,6 +70,8 @@ var Touiteur_Utilities = (function(){
 							return -4;
 						input = input.substring(nextChar);
 						nextChar = input.indexOf('"');
+						while (input[nextChar - 1] == "\\")
+							nextChar += input.substring(nextChar + 1).indexOf('"') + 1;
 						if (nextChar++ == -1)
 							return -5;
 					}

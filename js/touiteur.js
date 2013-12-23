@@ -23,6 +23,36 @@ var Touiteur = (function(){
 			req_type: "GET",
 			res_type: "text" // JSON
 		},
+		user_touites: {
+			url: touiteur_api + "api/touite/get_user_stream",
+			req_type: "GET",
+			res_type: "text" // JSON
+		},
+		user_follow: {
+			url: touiteur_api + "api/user/follow",
+			req_type: "POST",
+			res_type: "text" // JSON
+		},
+		user_unfollow: {
+			url: touiteur_api + "api/user/unfollow",
+			req_type: "POST",
+			res_type: "text" // JSON
+		},
+		user_followed: {
+			url: touiteur_api + "api/user/followed",
+			req_type: "GET",
+			res_type: "text" // JSON
+		},
+		user_followers: {
+			url: touiteur_api + "api/user/followers",
+			req_type: "GET",
+			res_type: "text" // JSON
+		},
+		user_list: {
+			url: touiteur_api + "api/user/list",
+			req_type: "GET",
+			res_type: "text" // JSON
+		},
 		submit_touite: {
 			url: touiteur_api + "api/touite/submit",
 			req_type: "POST",
@@ -45,14 +75,22 @@ var Touiteur = (function(){
 	$submit_touite = $('#touiteur_submit');
 	$wall_touites = $('#screen-2-wall');
 	$load_more_touites = $('#load-more-touites');
+	$touite_add_location = $('#touite_add_location');
+	$map = $("#map-container");
+	
 	wall_refresh_id = 0;
 	touites_first_id = -1;
 	touites_last_id = -1;
 	touites_page_nb_items = 10;
 	touites_page = 1;
-	$touite_add_location = $('#touite_add_location');
-	
-	$map = $("#map-container");
+
+	$wall_usertouites = $('#screen-4-wall');
+	$load_more_usertouites = $('#load-more-usertouites');
+	wall_refresh_id_user = 0;
+	touites_first_id_user = -1;
+	touites_last_id_user = -1;
+	touites_page_nb_items_user = 10;
+	touites_page_user = 1;
 	
 	$navbar = $('#navbar');
 	$signup = $('#touiteur-signup');
@@ -149,13 +187,21 @@ var Touiteur = (function(){
 			});
 		});
 
+		$load_more_usertouites.on('click', function(e){
+			e.preventDefault();
+			touites_page_user++;
+			load_touites_user(undefined, function(){
+				$(window).scrollTo($load_more_usertouites, 100);
+				$('html, body').scrollTo($load_more_usertouites, 100);
+			});
+		});
+
 		$submit_touite.find('textarea[name=touite]').charCounter(140,{container: "#poste_counter"});
 		$('#fileupload').fileupload({
 		    dataType: 'text',
 		    forceIframeTransport: true,
 		    url: api['submit_touite']['url'],
 		    acceptFileTypes: /(\.|\/)(jpe?g|png)$/i,
-		    maxNumberOfFiles: 1,
 		    formData: function(){
 				return [{
 						name: 'token',
@@ -177,6 +223,7 @@ var Touiteur = (function(){
 	        	$submit_touite.off('submit.touiteur');
 	        	notify('success', 'Touite Successfully Posted !');
 				$submit_touite.on('submit.touiteur', submitSimpleTouite);
+				renderTab('home');
 	        },
 	        fail: function (e, data) {
 	            notify('error', 'Error while Posting your Touite !');
@@ -184,10 +231,52 @@ var Touiteur = (function(){
 	        always: function (e, data) {
 	        }
 		});
+		
+		$('body').on('click', '[data-touiteur-action=answer]', function(){
+			alert('Click');
+		});
+		
 		$submit_touite.on('submit.touiteur', submitSimpleTouite);
 		$touite_add_location.on('click', function(){
 			getUserPosition();
 		});
+
+		$("[data-touiteur-action=unfollow]").click(function(e){
+			var id = $(this).data('touiteur-param');
+			e.preventDefault();
+			$.ajax({
+				type: api['user_unfollow']['req_type'],
+				url: api['user_unfollow']['url'],
+				dataType: api['user_unfollow']['res_type'],
+				data: {
+					token: $.cookie('touiteur_token'),
+					followed_id: id
+				}
+			}).done(function(data){
+				notify('success', 'Unfollow Registered !');
+			}).fail(function(data){
+	            notify('error', 'Error while Registering Unfollow, try again later !');
+			});
+		});
+
+		$("[data-touiteur-action=follow]").click(function(e){
+			var id = $(this).data('touiteur-param');
+			e.preventDefault();
+			$.ajax({
+				type: api['user_follow']['req_type'],
+				url: api['user_follow']['url'],
+				dataType: api['user_follow']['res_type'],
+				data: {
+					token: $.cookie('touiteur_token'),
+					followed_id: id
+				}
+			}).done(function(data){
+				notify('success', 'Follow Registered !');
+			}).fail(function(data){
+	            notify('error', 'Error while Registering Follow, try again later !');
+			});
+		});
+
 	}
 
 	var submitSimpleTouite = function(e){
@@ -202,6 +291,7 @@ var Touiteur = (function(){
 			}
 		}).done(function(data){
 			notify('success', 'Touite Successfully Posted !');
+			renderTab('home');
 		}).fail(function(data){
             notify('error', 'Error while Posting your Touite !');
 		});
@@ -220,6 +310,8 @@ var Touiteur = (function(){
 			$navbar.hide();
 		if (screen != "home")
 			clearInterval(wall_refresh_id);
+		if (screen != "profile")
+			clearInterval(wall_refresh_id_user);
 		switch (screen)
 		{
 			case "signin":
@@ -258,8 +350,38 @@ var Touiteur = (function(){
 				$submit_touite.find('textarea[name=touite]').val('');
 			break;
 			case "profile":
-				notify('success', "Displaying Profile of User : " + params.id);
-				renderTab("home");
+				wall_refresh_id_user = 0;
+				touites_first_id_user = -1;
+				touites_last_id_user = -1;
+				touites_page_nb_items_user = 10;
+				touites_page_user = 1;
+				$wall_usertouites.html('');
+				$.ajax({
+					type: api['user_details']['req_type'],
+					url: api['user_details']['url'],
+					dataType: api['user_details']['res_type'],
+					data: {
+						user_id: params.id,
+						token: $.cookie('touiteur_token')
+					}
+				}).done(function(data){
+					var r = Touiteur_Utilities.Json.decode(data);
+					user = r.data.user;
+					$("#user-name").html("<span class='text-primary'>" + user.login + "</span>");
+					$("#user-id").html(user.id);
+					$("#user-desc").html(user.description);
+					$("#user-mail").html(user.mail);
+					var date = new Date(parseInt(user.register_date) * 1000);
+					var date_str = $.format.date(date, "dd/MM/yyyy");
+					$('#user-register').html(date_str);
+					load_touites_user('new');
+					clearInterval(wall_refresh_id_user);
+					wall_refresh_id_user = setInterval(function(){
+						load_touites_user('new');
+					}, 30 * 1000);
+				}).fail(function(data){
+					notify('error', 'Error while Fetching User Details !');
+				});
 			break;
 		}
 	}
@@ -309,11 +431,12 @@ var Touiteur = (function(){
 			}
 		}).done(function(data){
 			var res = Touiteur_Utilities.Json.decode(data);
-			console.log(res);
 			var t = res.data.tweets;
 			var boxes = "";
 			var first_id = Infinity;
 			var last_id = -1;
+			var nb_touites = res.length;
+			console.warn(nb_touites);
 			for (p in t)
 			{
 				if (first_id == Infinity)
@@ -327,14 +450,16 @@ var Touiteur = (function(){
 				else if (last_id >= touites_last_id)
 					continue;
 				var date = new Date(parseInt(t[p].date) * 1000);
-				var date_str = $.format.prettyDate(date);
+				var now = new Date();
+				var date_str = $.format.prettyDate((date < now) ? date : now);
 				boxes +=
 					'<div class="wall-box">'+
 	                	'<blockquote>' +
 	                      '<p>' + t[p].content + '</p>' +
-	                      '<small>By <a href="#" data-touiteur-goto="profile" data-touiteur-profile="' + t[p].author_id + '" class="text-danger">' + 
+	                      '<div class="pull-left"><small>By <a href="#" data-touiteur-goto="profile" data-touiteur-profile="' + t[p].author_id + '" class="text-danger">' + 
 	                      t[p].author_login + '</a> '+
-	                      '<span class="text-info">' + date_str + '</span></small>' +
+	                      '<span class="text-info">' + date_str + '</span></small></div>' +
+	                      '<button class="pull-right btn btn-xs btn-warning data-touiteur-action="answer"><span class="glyphicon glyphicon-share-alt"></span>Answer</button>' +
 	                    '</blockquote>';
 	            if (t[p].image_url != "")
 	            	boxes += '<img src="' + touiteur_img_dir + t[p].image_url + '" class="img-thumbnail">';
@@ -349,7 +474,7 @@ var Touiteur = (function(){
 				$wall_touites.append(boxes);
 			if (touites_last_id == -1 || new_touites == undefined)
 				touites_last_id = last_id;
-			if (boxes == "" && new_touites == undefined){
+			if (boxes == "" && new_touites == undefined && nb_touites != 0){
 				$load_more_touites.trigger('click');
 				return;
 			}
@@ -370,6 +495,86 @@ var Touiteur = (function(){
 			});
 		}).fail(function(data){
 			notify('error', 'Error while Fetching Public Touites !');
+		});
+	}
+
+	var load_touites_user = function(new_touites, callback){
+		var id = $("#user-id").html();
+		$.ajax({
+			type: api['user_touites']['req_type'],
+			url: api['user_touites']['url'],
+			dataType: api['user_touites']['res_type'],
+			data: {
+				token: $.cookie('touiteur_token'),
+				item_by_page: touites_page_nb_items_user,
+				page: (new_touites != undefined) ? 1 : touites_page_user,
+				user_id: id
+			}
+		}).done(function(data){
+			var res = Touiteur_Utilities.Json.decode(data);
+			console.log(res);
+			var t = res.data.tweets;
+			var boxes = "";
+			var first_id = Infinity;
+			var last_id = -1;
+			var nb_touites = res.length;
+			for (p in t)
+			{
+				if (first_id == Infinity)
+					first_id = parseInt(t[p].id);
+				last_id = parseInt(t[p].id);
+				if (new_touites != undefined)
+				{
+					if (last_id <= touites_first_id_user)
+						break;
+				}
+				else if (last_id >= touites_last_id_user)
+					continue;
+				var date = new Date(parseInt(t[p].date) * 1000);
+				var date_str = $.format.prettyDate(date);
+				boxes +=
+					'<div class="wall-box">'+
+	                	'<blockquote>' +
+	                      '<p>' + t[p].content + '</p>' +
+	                      '<div class="pull-left"><small>By <a href="#" data-touiteur-goto="profile" data-touiteur-profile="' + t[p].author_id + '" class="text-danger">' + 
+	                      t[p].author_login + '</a> '+
+	                      '<span class="text-info">' + date_str + '</span></small></div>' +
+	                      '<button class="pull-right btn btn-xs btn-warning data-touiteur-action="answer"><span class="glyphicon glyphicon-share-alt"></span>Answer</button>' +
+	                    '</blockquote>';
+	            if (t[p].image_url != "")
+	            	boxes += '<img src="' + touiteur_img_dir + t[p].image_url + '" class="img-thumbnail">';
+	            boxes += '</div>';
+			}
+			if (new_touites != undefined)
+			{
+				touites_first_id_user = first_id;
+				$wall_usertouites.prepend(boxes);
+			}
+			else
+				$wall_usertouites.append(boxes);
+			if (touites_last_id_user == -1 || new_touites == undefined)
+				touites_last_id_user = last_id;
+			/*if (boxes == "" && new_touites == undefined && nb_touites != 0){
+				$load_more_usertouites.trigger('click');
+				return;
+			}*/
+			var msnry = $wall_usertouites.data('masonry');
+			if (msnry != undefined)
+				msnry.destroy();
+			$wall_usertouites.masonry({
+				  columnWidth: 300,
+				  itemSelector: '.wall-box',
+				  gutter: 30,
+				  isFitWidth: true,
+				  isInitLayout: true
+				});
+			$('img').load(function(){
+				$wall_usertouites.data('masonry').layout();
+				if (callback != undefined)
+					callback();
+			});
+		}).fail(function(data){
+			notify('error', 'Error while Fetching User Touites !');
 		});
 	}
 
