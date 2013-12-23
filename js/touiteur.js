@@ -53,6 +53,11 @@ var Touiteur = (function(){
 			req_type: "GET",
 			res_type: "text" // JSON
 		},
+		user_edit: {
+			url: touiteur_api + "api/user/edit",
+			req_type: "POST",
+			res_type: "text" // JSON
+		},
 		submit_touite: {
 			url: touiteur_api + "api/touite/submit",
 			req_type: "POST",
@@ -66,7 +71,8 @@ var Touiteur = (function(){
 		signup: { container: "#screen-1", navbar: false },
 		home: { container: "#screen-2", navbar: true },
 		post: { container: "#screen-3", navbar: true },
-		profile: { container: "#screen-4", navbar: true }
+		profile: { container: "#screen-4", navbar: true },
+		edit: { container: "#screen-5", navbar: true }
 	};
 	var screen_current;
 	var screen_old = screens.signin;
@@ -95,6 +101,7 @@ var Touiteur = (function(){
 	$navbar = $('#navbar');
 	$signup = $('#touiteur-signup');
 	$signin = $('#touiteur-signin');
+	$touiteur_edit = $('#touiteur_edit');
 
 	var init = function(screen){
 		for (var s in screens)
@@ -149,7 +156,6 @@ var Touiteur = (function(){
 				}
 			}).done(function(data){
 				var obj = Touiteur_Utilities.Xml.decode(data);
-				console.log(data);
 				notify('success', 'Successful Registration !');
 				renderTab('signin');
 			}).fail(function(data){
@@ -172,6 +178,7 @@ var Touiteur = (function(){
 				$.cookie('touiteur_token', res.root.data.user.token, { expires: 31 });
 				sync_user_details(res.root.data.user.id);
 				notify('success', 'Successful Authentication !');
+				$('#myprofile').data('touiteur-profile', res.root.data.user.id);
 				renderTab('home');
 			}).fail(function(data){
 				notify('error', 'Authentication Failed !');
@@ -232,13 +239,36 @@ var Touiteur = (function(){
 	        }
 		});
 		
-		$('body').on('click', '[data-touiteur-action=answer]', function(){
+/*		$('body').on('click', '[data-touiteur-action=answer]', function(){
 			alert('Click');
 		});
-		
+*/		
 		$submit_touite.on('submit.touiteur', submitSimpleTouite);
 		$touite_add_location.on('click', function(){
 			getUserPosition();
+		});
+
+		$touiteur_edit.on('submit', function(e){
+			e.preventDefault();
+			var mail = $(this).find('input').val();
+			var desc = $(this).find('textarea').val();
+			$.ajax({
+				type: api['user_edit']['req_type'],
+				url: api['user_edit']['url'],
+				dataType: api['user_edit']['res_type'],
+				data: {
+					token: $.cookie('touiteur_token'),
+					mail: mail,
+					description: desc
+				}
+			}).done(function(data){
+				notify('success', 'Profile Edited Successfully !');
+				$('#myprofile').trigger('click');
+				sync_user_details($('#user-id'));
+			}).fail(function(data){
+	            notify('error', 'Error while editing profile, remember: email is mandatory !');
+			});
+			
 		});
 
 		$("[data-touiteur-action=unfollow]").click(function(e){
@@ -367,6 +397,8 @@ var Touiteur = (function(){
 				}).done(function(data){
 					var r = Touiteur_Utilities.Json.decode(data);
 					user = r.data.user;
+					var myprofile = get_user_details();
+
 					$("#user-name").html("<span class='text-primary'>" + user.login + "</span>");
 					$("#user-id").html(user.id);
 					$("#user-desc").html(user.description);
@@ -374,6 +406,21 @@ var Touiteur = (function(){
 					var date = new Date(parseInt(user.register_date) * 1000);
 					var date_str = $.format.date(date, "dd/MM/yyyy");
 					$('#user-register').html(date_str);
+					if (myprofile[0] == user.id)
+					{
+						load_follows();
+						$('#edit').show();
+						$('#follow').show();
+						$('#user-follow').hide();
+						$('#user-unfollow').hide();
+					}
+					else
+					{
+						$('#edit').hide();
+						$('#follow').hide();
+						$('#user-follow').show();
+						$('#user-unfollow').show();
+					}
 					load_touites_user('new');
 					clearInterval(wall_refresh_id_user);
 					wall_refresh_id_user = setInterval(function(){
@@ -382,6 +429,12 @@ var Touiteur = (function(){
 				}).fail(function(data){
 					notify('error', 'Error while Fetching User Details !');
 				});
+			break;
+			case "edit":
+				var myprofile = get_user_details();
+				$touiteur_edit.find('input').val(myprofile[2]);
+				var regex = /<br\s*[\/]?>/gi;
+				$touiteur_edit.find('textarea').val(myprofile[4].replace(regex, "\n"));
 			break;
 		}
 	}
@@ -404,7 +457,6 @@ var Touiteur = (function(){
 			}
 		}).done(function(data){
 			var res = Touiteur_Utilities.Json.decode(data);
-			console.log(res);
 			$.cookie(
 				'touiteur_user',
 				res.data.user.id + "#!#!#!" +
@@ -436,7 +488,6 @@ var Touiteur = (function(){
 			var first_id = Infinity;
 			var last_id = -1;
 			var nb_touites = res.length;
-			console.warn(nb_touites);
 			for (p in t)
 			{
 				if (first_id == Infinity)
@@ -459,7 +510,7 @@ var Touiteur = (function(){
 	                      '<div class="pull-left"><small>By <a href="#" data-touiteur-goto="profile" data-touiteur-profile="' + t[p].author_id + '" class="text-danger">' + 
 	                      t[p].author_login + '</a> '+
 	                      '<span class="text-info">' + date_str + '</span></small></div>' +
-	                      '<button class="pull-right btn btn-xs btn-warning data-touiteur-action="answer"><span class="glyphicon glyphicon-share-alt"></span>Answer</button>' +
+	                      /*'<button class="pull-right btn btn-xs btn-warning data-touiteur-action="answer"><span class="glyphicon glyphicon-share-alt"></span>Answer</button>' +*/
 	                    '</blockquote>';
 	            if (t[p].image_url != "")
 	            	boxes += '<img src="' + touiteur_img_dir + t[p].image_url + '" class="img-thumbnail">';
@@ -512,7 +563,6 @@ var Touiteur = (function(){
 			}
 		}).done(function(data){
 			var res = Touiteur_Utilities.Json.decode(data);
-			console.log(res);
 			var t = res.data.tweets;
 			var boxes = "";
 			var first_id = Infinity;
@@ -531,7 +581,8 @@ var Touiteur = (function(){
 				else if (last_id >= touites_last_id_user)
 					continue;
 				var date = new Date(parseInt(t[p].date) * 1000);
-				var date_str = $.format.prettyDate(date);
+				var now = new Date();
+				var date_str = $.format.prettyDate((date < now) ? date : now);
 				boxes +=
 					'<div class="wall-box">'+
 	                	'<blockquote>' +
@@ -539,7 +590,7 @@ var Touiteur = (function(){
 	                      '<div class="pull-left"><small>By <a href="#" data-touiteur-goto="profile" data-touiteur-profile="' + t[p].author_id + '" class="text-danger">' + 
 	                      t[p].author_login + '</a> '+
 	                      '<span class="text-info">' + date_str + '</span></small></div>' +
-	                      '<button class="pull-right btn btn-xs btn-warning data-touiteur-action="answer"><span class="glyphicon glyphicon-share-alt"></span>Answer</button>' +
+	                      /*'<button class="pull-right btn btn-xs btn-warning data-touiteur-action="answer"><span class="glyphicon glyphicon-share-alt"></span>Answer</button>' +*/
 	                    '</blockquote>';
 	            if (t[p].image_url != "")
 	            	boxes += '<img src="' + touiteur_img_dir + t[p].image_url + '" class="img-thumbnail">';
@@ -575,6 +626,52 @@ var Touiteur = (function(){
 			});
 		}).fail(function(data){
 			notify('error', 'Error while Fetching User Touites !');
+		});
+	}
+
+	var load_follows = function(){
+		var id = $("#user-id").html();
+		$.ajax({
+			type: api['user_followed']['req_type'],
+			url: api['user_followed']['url'],
+			dataType: api['user_followed']['res_type'],
+			data: {
+				token: $.cookie('touiteur_token'),
+				user_id: id
+			}
+		}).done(function(data){
+			var res = Touiteur_Utilities.Json.decode(data);
+			var users = res.data.followed;
+			var str = "";
+			for (u in users)
+			{
+				str += '<a href="#" data-touiteur-goto="profile" data-touiteur-profile="' + users[u].id + '" class="text-danger">' + 
+	                      users[u].login + '</a> ';
+			}
+			$('#followed').html(str);
+		}).fail(function(data){
+			notify('error', 'Error while Fetching User Followed !');
+		});
+		$.ajax({
+			type: api['user_followed']['req_type'],
+			url: api['user_followed']['url'],
+			dataType: api['user_followed']['res_type'],
+			data: {
+				token: $.cookie('touiteur_token'),
+				user_id: id
+			}
+		}).done(function(data){
+			var res = Touiteur_Utilities.Json.decode(data);
+			var users = res.data.followers;
+			var str = "";
+			for (u in users)
+			{
+				str += '<a href="#" data-touiteur-goto="profile" data-touiteur-profile="' + users[u].id + '" class="text-danger">' + 
+	                      users[u].login + '</a> ';
+			}
+			$('#followers').html(str);
+		}).fail(function(data){
+			notify('error', 'Error while Fetching User Followers !');
 		});
 	}
 
@@ -643,7 +740,6 @@ $(document).ready(function() {
 	initScreen = 'signin';
 	Touiteur.init(initScreen);
 	//console.log(Touiteur_Utilities.Json.decode('{yo:{yo2:{yo3:"mama"},imad:"yeah"}}'));
-	touiteur_debug = true;
 	//console.log(Touiteur_Utilities.Json.decode('{"api_version":"1.0","success":true,"message":"","data":{"tweets":[{"content":"Go dodo..","date":1387240854},{"content":"Go dodo..","date":1387240854}]}'));
 	//console.log(Touiteur_Utilities.Json.decode('[{"content":"Go dodo..","date":1387240854},{"content":"Go dodo..","date":1387240854},{"content":"Go dodo..","date":1387240854}]'));
 	//console.log(Touiteur_Utilities.Xml.decode('<yo>qsd</yo><yo2>mama</yo2><yo6><yo4><yo3><imad>mama</imad></yo3></yo4></yo6><yo5><![CDATA[yeah]]></yo5><yo10><yo9>qsd</yo9></yo10>'));

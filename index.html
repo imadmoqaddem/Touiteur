@@ -41,7 +41,7 @@
             <div class="collapse navbar-collapse">
                 <ul class="nav navbar-nav pull-right">
                     <li class="pull-left"><a href="#" data-touiteur-goto="post"><span class="glyphicon glyphicon-pencil"></span>Post</a></li>
-                    <li class="pull-left"><a href="#"><span class="glyphicon glyphicon-user"></span>Profile</a></li>
+                    <li class="pull-left"><a href="#" id="myprofile" data-touiteur-goto="profile" data-touiteur-profile=""><span class="glyphicon glyphicon-user"></span>Profile</a></li>
                     <li class="pull-left"><a href="#" data-touiteur-goto="signin"><span class="glyphicon glyphicon-off"></span>Logout</a></li>
                 </ul>
             </div>
@@ -128,17 +128,37 @@
     <div class="container hidden-block" id="screen-4">
         <div class="wall-box profile-box">
             <blockquote>
-                <p id="user-name"></p><small id="user-id"></small> <small><cite><i class="glyphicon glyphicon-user"></i> <br /><span id="user-desc"></span></cite></small>
+                <p id="user-name"></p>
+                <small id="user-id"></small> <small><cite><i class="glyphicon glyphicon-user"></i> <br /><span id="user-desc"></span></cite></small>
             </blockquote>
             <p> <i class="glyphicon glyphicon-envelope"></i> <span id="user-mail"></span>
                 <br /> <i class="glyphicon glyphicon-calendar"></i> <span id="user-register"></span></p>
+
+            <a href="#" data-touiteur-goto="edit" id="edit"><small><i><b>Edit</b></i></small></a>
+            
             <button class="btn btn-xs btn-success" id="user-follow" data-touiteur-action="follow" data-touiteur-param="">Follow</button>
             <button class="btn btn-xs btn-danger" id="user-unfollow" data-touiteur-action="unfollow" data-touiteur-param="">Unfollow</button>
+            <div id="follow">
+                <h5>Follows</h5>
+                <span id="followers"></span>
+                <h5>Followed By</h5>
+                <span id="followed"></span>
+            </div>
         </div>
         <br /><br /><br />
         <div id="screen-4-wall">&nbsp;</div>
         <a href="#" id="load-more-usertouites" class="btn btn-primary">Load More</a>
         <br /><br /><br />
+    </div>
+
+    <div class="container hidden-block" id="screen-5">
+        <div class="white-background">&nbsp;</div>
+        <form id="touiteur_edit">
+            <input  placeholder="Type in your mail" class="form-control" name="mail" /><br />
+            <textarea class="form-control" placeholder="Type in your description" rows="3" name="desc"></textarea>
+            <button class="pull-right btn btn-sm btn-primary" type="submit">
+                Edit Profile</button>
+        </form>
     </div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
